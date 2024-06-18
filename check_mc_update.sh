@@ -7,7 +7,6 @@ SPIGOT_VERSION_MANIFEST=($(curl -s "$SPIGOT_VERSION_MANIFEST_URL" |\
                            grep -o -E '[0-9]\.[0-9]\.[0-9]|[0-9]\.[0-9][0-9]\.[0-9]|[0-9]\.[0-9][0-9]\.[0-9][0-9]|[0-9]\.[0-9][0-9]' |\
                            sort -t . -k 1,1n -k 2,2n -k 3,3n))
 LATEST_SPIGOT_VERSION=$(echo "${SPIGOT_VERSION_MANIFEST[-1]}")
-IS_SPIGOT=$(cat prevBuild.txt 2> /dev/null)
 
 # User options:
 # MC_SERVER_DIR = full path to the directory of your minecraft server
@@ -17,6 +16,8 @@ BUILD_TOOLS_DIR=/srv/minecraft/buildTools
 # VANILLA_UPDATE = download vanilla Minecraft server if no Spigot parity
 VANILLA_UPDATE=true
 
+# Check whether previous build is Spigot or vanilla.
+IS_SPIGOT=$(cat $BUILD_TOOLS_DIR/prevBuild.txt 2> /dev/null)
 
 # Change working directory
 pushd $BUILD_TOOLS_DIR
@@ -35,7 +36,7 @@ fi
 
 echo "The latest version of vanilla Minecraft server is $LATEST_VANILLA_VERSION."
 echo "The latest version of Spigot Minecraft Server is $LATEST_SPIGOT_VERSION."
-echo "You have version $CURRENT_SPIGOT_VERSION."
+echo "You have version $CURRENT_SPIGOT_VERSION ($IS_SPIGOT)."
 echo
 
 # If server is not up to date or is vanilla
@@ -55,11 +56,11 @@ then
     java -jar BuildTools.jar --rev $LATEST_VANILLA_VERSION --output-dir $MC_SERVER_DIR --final-name minecraft_server.jar
 
     # Tell script server jar is Spigot on next run
-    echo spigot > prevBuild.txt
+    echo "spigot" > prevBuild.txt
   else
     echo "Hmm...Looks like Spigot isn't up-to-date yet."
 
-    if [ "$VANILLA_UPDATE" == "true" ];
+    if [ $VANILLA_UPDATE == true ];
     then
       echo "Downloading vanilla..."
       # Determine the latest vanilla server version of Minecraft and download
@@ -69,7 +70,7 @@ then
       curl -L $VANILLA_JAR -o $MC_SERVER_DIR/minecraft_server.jar
 
       # Tell script server jar is vanilla on next run
-      echo vanilla > prevBuild.txt
+      echo "vanilla" > prevBuild.txt
     fi
   fi
 else

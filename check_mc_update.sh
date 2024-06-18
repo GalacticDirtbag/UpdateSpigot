@@ -4,7 +4,7 @@ VANILLA_VERSION_MANIFEST=$(curl -s "$VANILLA_VERSION_MANIFEST_URL")
 LATEST_VANILLA_VERSION=$(echo "$VANILLA_VERSION_MANIFEST" | jq -r '.latest.release')
 SPIGOT_VERSION_MANIFEST_URL=https://hub.spigotmc.org/versions/
 SPIGOT_VERSION_MANIFEST=($(curl -s "$SPIGOT_VERSION_MANIFEST_URL" |\
-                           grep -o -E '[0-9]\.[0-9]\.[0-9]|[0-9]\.[0-9][0-9]\.[0-9]|[0-9]\.[0-9][0-9]\.[0-9][0-9]' |\
+                           grep -o -E '[0-9]\.[0-9]\.[0-9]|[0-9]\.[0-9][0-9]\.[0-9]|[0-9]\.[0-9][0-9]\.[0-9][0-9]|[0-9]\.[0-9][0-9]' |\
                            sort -t . -k 1,1n -k 2,2n -k 3,3n))
 LATEST_SPIGOT_VERSION=$(echo "${SPIGOT_VERSION_MANIFEST[-1]}")
 IS_SPIGOT=$(cat prevBuild.txt 2> /dev/null)
